@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Santa's Gift 🎄</title>
+
+    <!-- Mobile support -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            background: linear-gradient(#0b3d0b, #145214);
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 10px;
+        }
+
+        h1 {
+            color: gold;
+            margin-top: 10px;
+        }
+
+        canvas {
+            background-color: #1a1a1a;
+            border: 5px solid red;
+            margin-top: 15px;
+            width: 90vw;
+            max-width: 400px;
+            height: auto;
+        }
+
+        .controls {
+            margin-top: 15px;
+        }
+
+        .controls button {
+            font-size: 26px;
+            padding: 10px 16px;
+            margin: 5px;
+            border-radius: 12px;
+            border: none;
+            background: #0f7a0f;
+            color: white;
+        }
+
+        .credit {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #ffdddd;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+<h1>🎄 Santa's Gift 🎅</h1>
+<p>Use arrow keys (PC) or buttons (Phone)</p>
+
+<canvas id="game" width="400" height="400"></canvas>
+
+<!-- Touch Controls -->
+<div class="controls">
+    <button onclick="setDir('UP')">⬆️</button><br>
+    <button onclick="setDir('LEFT')">⬅️</button>
+    <button onclick="setDir('DOWN')">⬇️</button>
+    <button onclick="setDir('RIGHT')">➡️</button>
+</div>
+
+<p class="credit">Created by YeL 🎄</p>
+
+<script>
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+const box = 20;
+
+// Snake (Santa)
+let santa = [{ x: 9 * box, y: 10 * box }];
+
+// Food (Gift)
+let gift = {
+    x: Math.floor(Math.random() * 19) * box,
+    y: Math.floor(Math.random() * 19) * box
+};
+
+let direction;
+
+// Keyboard controls
+document.addEventListener("keydown", event => {
+    if (event.key === "ArrowUp" && direction !== "DOWN") direction = "UP";
+    else if (event.key === "ArrowDown" && direction !== "UP") direction = "DOWN";
+    else if (event.key === "ArrowLeft" && direction !== "RIGHT") direction = "LEFT";
+    else if (event.key === "ArrowRight" && direction !== "LEFT") direction = "RIGHT";
+});
+
+// Touch controls
+function setDir(dir) {
+    if (dir === "UP" && direction !== "DOWN") direction = "UP";
+    if (dir === "DOWN" && direction !== "UP") direction = "DOWN";
+    if (dir === "LEFT" && direction !== "RIGHT") direction = "LEFT";
+    if (dir === "RIGHT" && direction !== "LEFT") direction = "RIGHT";
+}
+
+// Draw Santa + gifts
+function drawSanta() {
+    ctx.font = "20px Arial";
+
+    for (let i = 0; i < santa.length; i++) {
+        if (i === 0) {
+            ctx.fillText("🎅", santa[i].x + 1, santa[i].y + 18);
+        } else {
+            ctx.fillText("🎁", santa[i].x + 1, santa[i].y + 18);
+        }
+    }
+}
+
+// Draw food
+function drawGift() {
+    ctx.font = "20px Arial";
+    ctx.fillText("🎁", gift.x + 1, gift.y + 18);
+}
+
+// Game loop
+function game() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    drawSanta();
+    drawGift();
+
+    let santaX = santa[0].x;
+    let santaY = santa[0].y;
+
+    if (direction === "UP") santaY -= box;
+    if (direction === "DOWN") santaY += box;
+    if (direction === "LEFT") santaX -= box;
+    if (direction === "RIGHT") santaX += box;
+
+    // Eat gift
+    if (santaX === gift.x && santaY === gift.y) {
+        gift = {
+            x: Math.floor(Math.random() * 19) * box,
+            y: Math.floor(Math.random() * 19) * box
+        };
+    } else {
+        santa.pop();
+    }
+
+    let newHead = { x: santaX, y: santaY };
+
+    // Game over if hit wall
+    if (
+        santaX < 0 || santaY < 0 ||
+        santaX >= canvas.width || santaY >= canvas.height
+    ) {
+        clearInterval(gameLoop);
+        alert("🎄 Game Over! Happy Christmas!");
+    }
+
+    santa.unshift(newHead);
+}
+
+let gameLoop = setInterval(game, 120);
+</script>
+
+</body>
+</html>
